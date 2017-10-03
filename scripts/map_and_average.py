@@ -11,14 +11,14 @@ import pickle
 import util_feature_learning
     
 WIN_SIZE = 8
-INPUT_FILES = ['/import/c4dm-04/mariap/train_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-               '/import/c4dm-04/mariap/val_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-               '/import/c4dm-04/mariap/test_data_melodia_'+str(WIN_SIZE)+'.pickle']
-OUTPUT_FILES = ['/import/c4dm-04/mariap/lda_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-                '/import/c4dm-04/mariap/pca_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-                '/import/c4dm-04/mariap/nmf_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-                '/import/c4dm-04/mariap/ssnmf_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-                '/import/c4dm-04/mariap/na_data_melodia_'+str(WIN_SIZE)+'.pickle']
+INPUT_FILES = ['../data/train_data_'+str(WIN_SIZE)+'.pickle', 
+               '../data/val_data_'+str(WIN_SIZE)+'.pickle', 
+               '../data/test_data_'+str(WIN_SIZE)+'.pickle']
+OUTPUT_FILES = ['../data/lda_data_'+str(WIN_SIZE)+'.pickle', 
+                '../data/pca_data_'+str(WIN_SIZE)+'.pickle', 
+                '../data/nmf_data_'+str(WIN_SIZE)+'.pickle', 
+                '../data/ssnmf_data_'+str(WIN_SIZE)+'.pickle', 
+                '../data/na_data_'+str(WIN_SIZE)+'.pickle']
 
 
 def remove_inds(features, labels, audiolabels):

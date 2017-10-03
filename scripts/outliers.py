@@ -120,7 +120,7 @@ def get_country_clusters(X, bestncl=None, min_ncl=5, max_ncl=50):
 
 if __name__ == '__main__':
     # load LDA-transformed frames
-    dataset, ddf, w_dict = load_data('data/lda_data_8.pickle', 'data/metadata.csv')
+    dataset, ddf, w_dict = load_data('../data/lda_data_8.pickle', '../data/metadata.csv')
     X_list, Y, Yaudio = dataset
     X = np.concatenate(X_list, axis=1)
 
@@ -143,23 +143,9 @@ if __name__ == '__main__':
 
     ## how many styles are there
     ##bestncl, ave_silh = utils.best_n_clusters_silhouette(X, min_ncl=5, max_ncl=50, metric="cosine")
-    #bestncl = 13
-    ## get cluster predictions and metadata for each cluster
-    #cluster_model = KMeans(n_clusters=bestncl, random_state=50).fit(X)
-    #centroids = cluster_model.cluster_centers_
-    #cl_pred = cluster_model.predict(X)
-    centroids, cl_pred = get_country_clusters(X, bestncl=13)
+    centroids, cl_pred = get_country_clusters(X, bestncl=10)
     ddf['Clusters'] = cl_pred
     print_clusters_metadata(ddf, cl_pred)
 
     # how similar are the cultures and which ones seem to be global outliers
     cluster_freq = utils.get_cluster_freq_linear(X, Y, centroids)
-
-    ## Moran on Mahalanobis distances
-    #data = cluster_freq.get_values()
-    #data_countries = cluster_freq.index
-    ##threshold, y_pred, MD = utils.get_outliers_Mahal(data, chi2thr=0.999)
-    #threshold, y_pred, MD = utils.get_outliers(data, chi2thr=0.999)
-    #y = np.sqrt(MD)
-    #utils_spatial.print_Moran_outliers(y, w, data_countries)
-    #utils_spatial.plot_Moran_scatterplot(y, w, data_countries)

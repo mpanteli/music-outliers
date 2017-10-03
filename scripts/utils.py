@@ -74,7 +74,6 @@ def get_local_outliers_from_neighbors_dict(X, Y, w_dict, chi2thr=0.975, do_pca=F
             XX, _ = pca_data(X[inds_neighborhood, :], min_variance=0.99)
         else:
             XX = X[inds_neighborhood, :]  # assume X is already in PCA
-        print len(inds_neighborhood)
         if len(inds_neighborhood)<XX.shape[1]:
             print uniq_label, " neighborhood too small for number of features"
             continue

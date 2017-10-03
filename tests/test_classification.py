@@ -19,7 +19,7 @@ def test_confusion_matrix():
     X[-50:, :] = X[-50:, :] + 10
     Y = np.concatenate([np.repeat('a', 50), np.repeat('b', 50)])
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, train_size=0.6, random_state=1, stratify=Y)
-    accuracy, _ = classification.confusion_matrix(X_train, Y_train, X_test, Y_test)
+    accuracy, _, _ = classification.confusion_matrix(X_train, Y_train, X_test, Y_test)
     # expect perfect accuracy for this 'easy' dataset
     assert accuracy == 1.0
 

@@ -17,10 +17,10 @@ import util_filter_dataset
 #METADATA_FILE = 'sample_dataset/metadata.csv'
 #OUTPUT_FILES = ['sample_dataset/train_data.pickle', 'sample_dataset/val_data.pickle', 'sample_dataset/test_data.pickle']
 WIN_SIZE = 8
-METADATA_FILE = '../data/metadata_BLSM_language_all.csv'
-OUTPUT_FILES = ['/import/c4dm-04/mariap/train_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-                '/import/c4dm-04/mariap/val_data_melodia_'+str(WIN_SIZE)+'.pickle', 
-                '/import/c4dm-04/mariap/test_data_melodia_'+str(WIN_SIZE)+'.pickle']
+METADATA_FILE = '../data/metadata.csv'
+OUTPUT_FILES = ['../data/train_data_'+str(WIN_SIZE)+'.pickle', 
+                '../data/val_data_'+str(WIN_SIZE)+'.pickle', 
+                '../data/test_data_'+str(WIN_SIZE)+'.pickle']
 
 
 def get_train_val_test_idx(X, Y, seed=None):

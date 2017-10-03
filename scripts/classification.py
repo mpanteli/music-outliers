@@ -9,6 +9,7 @@ import pandas as pd
 import pickle
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 import map_and_average
 import util_feature_learning
@@ -59,7 +60,6 @@ def classify_for_filenames(file_list=FILENAMES):
     feat_learner = util_feature_learning.Transformer()
     #traininds, testinds = get_train_test_indices(Yaudio)
     for filename, transform_label in zip(file_list, TRANSFORM_LABELS):
-        print filename
         X, Y, Yaudio = load_data_from_pickle(filename)
         #X_train, Y_train, X_test, Y_test = get_train_test_sets(X, Y, traininds, testinds)
         X_train, X_val_test, Y_train, Y_val_test = train_test_split(X, Y, train_size=0.6, random_state=RANDOM_STATE, stratify=Y)
@@ -92,16 +92,25 @@ def classify_each_feature(X_train, Y_train, X_test, Y_test, filename, transform_
 def plot_CF(CF, labels=None, figurename=None):
     labels[labels=='United States of America'] = 'United States Amer.'
     plt.imshow(CF, cmap="Greys")
-    plt.xticks(range(len(labels)), labels, rotation='vertical', fontsize=4)
-    plt.yticks(range(len(labels)), labels, fontsize=4)
+    plt.xticks(range(len(labels)), labels, rotation='vertical')
+    plt.yticks(range(len(labels)), labels)
+    plt.colorbar()
     if figurename is not None:
         plt.savefig(figurename, bbox_inches='tight')
 
 
-def confusion_matrix(X_train, Y_train, X_test, Y_test, saveCF=False, plots=False):
+def confusion_matrix(X_train, Y_train, X_test, Y_test, classifier='LDA'):
     feat_learner = util_feature_learning.Transformer()
+    if classifier=='LDA':
+        model = feat_learner.modelLDA
+    elif classifier=='KNN':
+        model = feat_learner.modelKNN
+    elif classifier=='SVM':
+        model = feat_learner.modelSVM
+    elif classifier=='RF':
+        model = feat_learner.modelRF
     accuracy, predictions = feat_learner.classification_accuracy(X_train, Y_train, 
-                        X_test, Y_test, model=feat_learner.modelLDA)
+                        X_test, Y_test, model=model)
     labels = np.unique(Y_test)  # TODO: countries in geographical proximity
     CF = metrics.confusion_matrix(Y_test, predictions, labels=labels)
     if saveCF:
@@ -109,24 +118,19 @@ def confusion_matrix(X_train, Y_train, X_test, Y_test, saveCF=False, plots=False
         np.savetxt('data/CF.csv', CF, fmt='%10.5f')
     if plots:
         plot_CF(CF, labels=labels, figurename='data/conf_matrix.pdf')
-    return accuracy, CF 
+    return accuracy, CF, labels 
 
 
-def confusion_matrix_for_best_classification_result(df_results, output_data=False):
-    max_i = np.argmax(df_results[:, 1])
-    feat_learning_i = max_i % 4  # 4 classifiers for each feature learning method
-    filename = FILENAMES[feat_learning_i]
-    print filename
+def confusion_matrix_for_dataset(df_results, filename, classifier='LDA', output_data=False):
     X, Y, Yaudio = load_data_from_pickle(filename)
-    #traininds, testinds = get_train_test_indices(Yaudio)
-    #X_train, Y_train, X_test, Y_test = get_train_test_sets(X, Y, traininds, testinds)
     X_train, X_val_test, Y_train, Y_val_test = train_test_split(X, Y, train_size=0.6, random_state=RANDOM_STATE, stratify=Y)
     X_val, X_test, Y_val, Y_test = train_test_split(X_val_test, Y_val_test, train_size=0.5, random_state=RANDOM_STATE, stratify=Y_val_test)
+    accuracy, CF, labels = confusion_matrix(X_train, Y_train, X_test, Y_test, classifier=classifier)
     if output_data:
-        _, CF = confusion_matrix(X_train, Y_train, X_test, Y_test, saveCF=True, plots=True)
-    else:
-        _, CF = confusion_matrix(X_train, Y_train, X_test, Y_test, saveCF=False, plots=False)
-    return CF
+        np.savetxt('../data/CFlabels.csv', labels, fmt='%s')
+        np.savetxt('../data/CF.csv', CF, fmt='%10.5f')
+        plot_CF(CF, labels=labels, figurename='../data/conf_matrix.pdf')
+    return CF, labels
 
 
 if __name__ == '__main__':
