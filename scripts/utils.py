@@ -16,16 +16,6 @@ from scipy.spatial.distance import mahalanobis
 from sklearn.covariance import MinCovDet
 
 
-def get_outliers(X, chi2thr=0.975):
-    robust_cov = MinCovDet().fit(X)
-    MD = robust_cov.mahalanobis(X)
-    chi2 = stats.chi2
-    degrees_of_freedom = X.shape[1]
-    threshold = chi2.ppf(chi2thr, degrees_of_freedom)
-    y_pred = MD>threshold
-    return threshold, y_pred, MD
-
-
 def get_outliers_Mahal(X, chi2thr=0.975):
     n_samples = X.shape[0]
     inv_cov = np.linalg.inv(np.cov(X.T))
