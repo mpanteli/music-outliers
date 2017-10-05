@@ -97,7 +97,6 @@ def load_data(pickle_file, metadata_file):
     ddf = load_metadata(Yaudio, metadata_file=metadata_file)
     w, data_countries = utils_spatial.get_neighbors_for_countries_in_dataset(Y)
     w_dict = utils_spatial.from_weights_to_dict(w, data_countries)
-    ddf = utils_spatial.append_regions(ddf)
     return [X_list, Y, Yaudio], ddf, w_dict
 
 

@@ -85,7 +85,8 @@ def add_bokeh_interactivity(p, r, hover_outlier=False):
         <div>
             <div><span style="font-size: 17px; font-weight: bold;">@name</span></div>
             <div><span style="font-size: 12px;">@info</span></div>
-            <div><span style="font-size: 10px; color: #500;">Outlier(MD):@outlierMD</span></div>
+            <div><span style="font-size: 10px; color: #500;">@outlierMD</span></div>
+            <div><span style="font-size: 12px;">@collection</span></div>
         </div>"""
     if hover_outlier:
         p.add_tools(HoverTool(renderers=[r], tooltips=hover_tooltips_outlier))
@@ -123,15 +124,24 @@ def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
     circle_color = np.repeat('grey', repeats=len(y_pred))
     circle_color[y_pred] = 'red'
     
+    outlier_info = []
+    for i in range(len(MD)):
+        if y_pred[i]:
+            # if outlier
+            outlier_info.append('outlier, MD=' + str(int(MD[i])))
+        else:
+            outlier_info.append('non-outlier, MD=' + str(int(MD[i])))
+
     source = ColumnDataSource(data=dict(
         x=data_x,
         y=data_y,
         name=df['Country'].get_values(),
         color=circle_color,
         alpha=alpha_color,
-        info = zip(df['Culture'].get_values(),df['Language'].get_values(),df['Genre_Album'].get_values()),
-        outlierMD=[str(y_pred[i])+'('+str(int(MD[i]))+')' for i in range(len(MD))],  
-        url=df['songurls_Album'].get_values()
+        info = zip(df['Culture'].get_values(),df['Language'].get_values(),df['Genre'].get_values()),
+        outlierMD = outlier_info,
+        collection = df['Collection'].get_values(),
+        url=df['Url'].get_values()
     ))
     
     TOOLS="wheel_zoom,box_zoom,pan,reset,save"
@@ -149,11 +159,6 @@ def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
     
     p = add_bokeh_interactivity(p, r2, hover_outlier=True)
     p = beautify_bokeh_background(p)
-    
-    #explanation = Label(x=70, y=70, x_units='screen', y_units='screen',
-    #             text='Scatter points represent recordings from each country randomly drawn within the boundaries of the country. Red points represent recordings detected as outliers and grey points as non-outliers. Hover over your mouse to get additional information of the Country, Language, Culture, Genre, and whether the recording was detected as outlier (True/False) and its Mahalanobis distance (MD). Click on each point to be redirected to the Smithsonian Folkways or British Library website to listen to the audio.', border_line_color='black', border_line_alpha=1.0,
-    #             background_fill_color='white', background_fill_alpha=1.0)
-    #p.add_layout(explanation)
     
     if out_file is not None:
         output_file(out_file)
