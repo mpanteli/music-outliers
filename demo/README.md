@@ -25,14 +25,15 @@ Each recording is represented as a point **drawn at random** within the boundari
 - whether this recording was detected as an outlier, e.g., *non-outlier*, 
 - and its corresponding Mahalanobis Distance (MD), e.g., *MD=306*. 
 
-![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/demo/hover-mouse.png)
+![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/demo/pics/hover-mouse.png)
 
 **Click** on each point to listen to the audio (redirects to the Smithsonian Folkways and British Library websites). 
 
 **Choose tab** *Rhythm, Melody, Timbre, Harmony* to see the outcome of music outliers with respect to rhythmic, melodic, timbral, and harmonic features. Default tab *All* shows music outliers when all features are combined. 
 
-![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/demo/tabs.png)
+![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/demo/pics/tabs.png)
 
 **Explore interactivity** such as *Pan, Box zoom, Save* with the tools on the right. 
 
-![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/demo/interactivity.png)
+![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/demo/pics/interactivity.png)
+
