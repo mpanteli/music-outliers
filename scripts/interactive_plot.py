@@ -114,10 +114,6 @@ def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
     pp_x, pp_y, coords_poly, countries_poly = get_countries_lonlat_poly(SHAPEFILE)    
     data_x, data_y = get_random_point_in_country_poly(df['Country'].get_values())    
 
-    #threshold, y_pred, MD = get_outliers(features, chi2thr=0.995)
-    #alpha_color = MD/np.max(MD) # if outlier vary transparency wrt MD
-    #alpha_color[y_pred==False] = 0.2  # if not outlier just color white
-    # min transparency at least 0.5
     alpha_color = (MD-np.min(MD)+0.5)/(np.max(MD)-np.min(MD)+0.5)
     alpha_color[y_pred==False] = 0.3
     
@@ -146,7 +142,7 @@ def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
     
     TOOLS="wheel_zoom,box_zoom,pan,reset,save"
     
-    p = figure(tools=TOOLS, plot_width=1200, title="Outlier recordings per country. Click on each point to be redirected to the Smithsonian Folkways or British Library website to listen to the audio.")
+    p = figure(tools=TOOLS, plot_width=1200, title="Outlier recordings per country (click on each point to listen to the audio). More info at: github.com/mpanteli/music-outliers/tree/master/demo/README.md.")
     outlier_ind = np.argmax(MD)
     nonoutlier_ind = np.argmin(MD)
     rleg1 = p.circle(data_x[outlier_ind], data_y[outlier_ind], fill_color='red', alpha=alpha_color[outlier_ind], size=6,
