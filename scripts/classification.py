@@ -113,11 +113,6 @@ def confusion_matrix(X_train, Y_train, X_test, Y_test, classifier='LDA'):
                         X_test, Y_test, model=model)
     labels = np.unique(Y_test)  # TODO: countries in geographical proximity
     CF = metrics.confusion_matrix(Y_test, predictions, labels=labels)
-    if saveCF:
-        np.savetxt('data/CFlabels.csv', labels, fmt='%s')
-        np.savetxt('data/CF.csv', CF, fmt='%10.5f')
-    if plots:
-        plot_CF(CF, labels=labels, figurename='data/conf_matrix.pdf')
     return accuracy, CF, labels 
 
 
