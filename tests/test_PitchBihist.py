@@ -14,8 +14,7 @@ import scripts.PitchBihist as PitchBihist
 
 
 pbi = PitchBihist.PitchBihist()
-TEST_MELODIA_FILE = os.path.join(os.path.dirname(__file__), os.path.pardir, 
-                                 'data', 'sample_dataset', 'Melodia', 'mel_1_2_1.csv')
+TEST_MELODIA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'melodia_mel_1_2_1.csv')
 
 def test_hz_to_cents():
     freq_Hz = np.array([32.703, 65.406, 55, 110])

@@ -15,10 +15,8 @@ import scripts.load_features as load_features
 
 feat_loader = load_features.FeatureLoader(win2sec=8)
 
-TEST_METADATA_FILE = os.path.join(os.path.dirname(__file__), os.path.pardir, 
-                                    'data', 'sample_dataset', 'metadata.csv')
-TEST_MELODIA_FILE = os.path.join(os.path.dirname(__file__), os.path.pardir, 
-                                 'data', 'sample_dataset', 'Melodia', 'mel_1_2_1.csv')
+TEST_METADATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'metadata.csv')
+TEST_MELODIA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'melodia_mel_1_2_1.csv')
 
 def test_get_music_idx_from_bounds():
     bounds = np.array([['0', '10.5', 'm']])
@@ -236,28 +234,22 @@ def test_get_pb_for_file_nmf():
 def test_get_features():
     df = pd.read_csv(TEST_METADATA_FILE)
     df = df.iloc[:1, :]
-    os.chdir('data/')
     data_list = feat_loader.get_features(df, precomp_melody=False)
-    os.chdir('..')
     assert len(np.unique(data_list[-1])) == 1
 
 
 def test_get_features_n_files():
     df = pd.read_csv(TEST_METADATA_FILE)
-    n_files = 3
+    n_files = 1
     df = df.iloc[:n_files, :]
-    os.chdir('data/')
     data_list = feat_loader.get_features(df, precomp_melody=False)
-    os.chdir('..')
     assert len(np.unique(data_list[-1])) == n_files
 
 
 def test_get_features_n_frames():
     df = pd.read_csv(TEST_METADATA_FILE)
     df = df.iloc[:1, :]
-    os.chdir('data/')
     data_list = feat_loader.get_features(df, precomp_melody=False)
-    os.chdir('..')
     dur_sec = 11.5  # duration of first file in metadata.csv is > 11 seconds
     n_frames_true = np.round((dur_sec - feat_loader.win2sec) * feat_loader.framessr2)
     assert len(data_list[0]) == n_frames_true

@@ -14,8 +14,7 @@ import scripts.OPMellin as OPMellin
 
 
 opm = OPMellin.OPMellin()
-TEST_AUDIO_FILE = os.path.join(os.path.dirname(__file__), os.path.pardir, 
-                                 'data', 'sample_dataset', 'Audio', 'mel_1_2_1.wav')
+TEST_AUDIO_FILE = os.path.join(os.path.dirname(__file__), 'data', 'mel_1_2_1.wav')
 
 def test_load_audiofile():
     audiofile = TEST_AUDIO_FILE
