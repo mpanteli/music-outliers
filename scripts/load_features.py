@@ -26,7 +26,25 @@ class FeatureLoader:
         self.framessr2 = self.framessr/float(self.hop2)
     
     
-    def get_op_mfcc_for_file(self, melspec_file=None, scale=True, stop_sec=30.0):
+    def get_op_mfcc_for_file(self, melspec_file, scale=True, stop_sec=30.0):
+        '''Extract onset patterns with scale transform and mfcc features from the mel-spectrogram. 
+
+        Parameters
+        ----------
+        melspec_file : str
+            Path to mel-spectrogram.
+        scale : boolean
+            Whether to scale the features for each 8-second frame.
+        stop_sec : float
+            The total duration (in seconds) to consider for processing.
+
+        Returns
+        -------
+        op : pd.DataFrame
+            Onset patterns with scale transform features.
+        mfc : pd.DataFrame
+            Mfcc features.
+        '''
         op = []
         mfc = []
         if not os.path.exists(melspec_file):
@@ -46,7 +64,23 @@ class FeatureLoader:
         return op, mfc
     
     
-    def get_chroma_for_file(self, chroma_file=None, scale=True, stop_sec=30.0):
+    def get_chroma_for_file(self, chroma_file, scale=True, stop_sec=30.0):
+        '''Extract chroma features from the chromagram. 
+
+        Parameters
+        ----------
+        chroma_file : str
+            Path to chromagram.
+        scale : boolean
+            Whether to scale the features for each 8-second frame.
+        stop_sec : float
+            The total duration (in seconds) to consider for processing.
+
+        Returns
+        -------
+        ch : pd.DataFrame
+            Chroma features.
+        '''
         ch = []
         if not os.path.exists(chroma_file):
             return ch
@@ -64,6 +98,20 @@ class FeatureLoader:
     
         
     def get_music_idx_from_bounds(self, bounds, sr=None):
+        '''Process speech/music boundaries and return indices of the music frames.
+
+        Parameters
+        ----------
+        bounds : np.array
+            Output of speech/music segmentation algorithm.
+        sr : float
+            Sampling rate for output frame indices.
+
+        Returns
+        -------
+        music_idx : np.array
+            Indices of music frames.
+        '''
         music_idx = []
         if len(bounds) == 0:  
             # bounds is empty list
@@ -77,13 +125,10 @@ class FeatureLoader:
             return music_idx
         else:
             win2_frames = np.int(np.round(self.win2sec * self.framessr2))
-            #half_win_hop = int(round(0.5 * self.win2 / float(self.hop2)))
             music_bounds = np.where(bounds[:, 2] == 'm')[0]
             bounds_in_frames = np.round(np.array(bounds[:, 0], dtype=float) * sr)
             duration_in_frames = np.ceil(np.array(bounds[:, 1], dtype=float) * sr)
             for music_bound in music_bounds:
-                #lower_bound = np.max([0, bounds_in_frames[music_bound] - half_win_hop])
-                #upper_bound = bounds_in_frames[music_bound] + duration_in_frames[music_bound] - half_win_hop
                 lower_bound = bounds_in_frames[music_bound]
                 upper_bound = bounds_in_frames[music_bound] + duration_in_frames[music_bound] - win2_frames
                 music_idx.append(np.arange(lower_bound, upper_bound, dtype=int))
@@ -92,7 +137,19 @@ class FeatureLoader:
         return music_idx
 
     
-    def get_music_idx_for_file(self, segmenter_file=None):
+    def get_music_idx_for_file(self, segmenter_file):
+        '''Load speech/music segmentation output.
+
+        Parameters
+        ----------
+        segmenter_file : str
+            Path to speech/music segmentation file.
+
+        Returns
+        -------
+        music_idx : np.array
+            Indices of music frames.
+        '''
         music_idx = []
         if os.path.exists(segmenter_file) and os.path.getsize(segmenter_file)>0:
             print 'loading speech/music segments...'
@@ -104,6 +161,28 @@ class FeatureLoader:
     
     
     def get_features(self, df, stop_sec=30.0, class_label='Country', precomp_melody=True):
+        '''Extract features from mel-spectrograms, chromagrams and melodies.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Dataframe holding the path to feature files.
+        stop_sec : float
+            The total duration (in seconds) to consider for processing.
+        class_label : str
+            Dataframe column to consider as class labels.
+        precomp_melody : boolean
+            Whether to load precomputed pitch bihistograms or extract them from melodia output.
+
+        Returns
+        -------
+        oplist, mflist, chlist, pblist : pd.DataFrame
+            Rhythm, timbre, chroma, melody features.
+        clabels : pd.DataFrame
+            Class labels.
+        aulabels : pd.DataFrame
+            Audio labels.
+        '''
         oplist = []
         mflist = []
         chlist = []
@@ -112,12 +191,12 @@ class FeatureLoader:
         aulabels = []
         n_files = len(df)
         for i in range(n_files):
-            if not (os.path.exists(df['Melspec'].iloc[i]) and os.path.exists(df['Chroma'].iloc[i]) and os.path.exists(df['Melodia'].iloc[i])):
+            if not (os.path.exists(df['Melspec'].iloc[i]) and 
+                    os.path.exists(df['Chroma'].iloc[i]) and 
+                    os.path.exists(df['Melodia'].iloc[i])):
                 continue
             print 'file ' + str(i) + ' of ' + str(n_files)
             music_idx = self.get_music_idx_for_file(df['Speech'].iloc[i])
-            #min_dur_sec=8.0
-            #min_n_frames = np.int(np.floor(min_dur_sec * self.framessr2))
             if len(music_idx)==0:  # or len(music_idx)<min_n_frames:
                 # no music segments or music segment too short -> skip this file
                 continue
@@ -128,10 +207,6 @@ class FeatureLoader:
                 op, mfcc = self.get_op_mfcc_for_file(df['Melspec'].iloc[i], stop_sec=stop_sec_feat)
                 ch = self.get_chroma_for_file(df['Chroma'].iloc[i], stop_sec=stop_sec_feat)
                 pb = self.get_pb_for_file(df['Melodia'].iloc[i], precomp_melody=precomp_melody, stop_sec=stop_sec_feat)
-                #if precomp_melody:
-                #    pb = self.load_precomputed_pb_from_melodia(df['Melodia'].iloc[i], stop_sec=stop_sec)
-                #else:
-                #    pb = self.get_pb_from_melodia(df['Melodia'].iloc[i], stop_sec=stop_sec)
             except:
                 continue
             n_stop = np.int(np.ceil(stop_sec * self.framessr2))
@@ -154,6 +229,20 @@ class FeatureLoader:
 
             
     def get_op_from_melspec(self, melspec, K=None):
+        '''Extract onset patterns with scale transform from mel-spectrogram.
+
+        Parameters
+        ----------
+        melspec : np.array
+            Mel-spectrogram
+        K : int
+            Mel bands split in K groups and averaged.
+
+        Returns
+        -------
+        opmel : pd.DataFrame
+            Rhythm features.
+        '''
         op = opm.OPMellin(win2sec=self.win2sec)
         opmellin = op.get_opmellin_from_melspec(melspec=melspec, melsr=self.framessr)
         opmel = pd.DataFrame(opmellin.T)
@@ -164,6 +253,8 @@ class FeatureLoader:
 
 
     def get_mfcc_from_melspec(self, melspec, deltamfcc=True, avelocalframes=True, stdlocalframes=True):
+        '''Extract MFCC stats from mel-spectrogram.
+        '''
         mf = mfc.MFCCs()        
         mfcc = mf.get_mfccs_from_melspec(melspec=melspec, melsr=self.framessr)
         if deltamfcc:
@@ -179,6 +270,8 @@ class FeatureLoader:
 
 
     def get_ave_chroma(self, chroma, alignchroma=True, avelocalframes=True, stdlocalframes=True):
+        '''Extract chroma stats from chromagram.
+        '''
         chroma[np.where(np.isnan(chroma))] = 0
         if alignchroma:
             maxind = np.argmax(np.sum(chroma, axis=1))  # bin with max magnitude across time
@@ -190,6 +283,8 @@ class FeatureLoader:
   
     
     def average_local_frames(self, frames, getstd=False):
+        '''Average frames over 8-second windows (for MFCC and chroma features).
+        '''
         nbins, norigframes = frames.shape
         if norigframes<self.win2:
             nframes = 1
@@ -209,6 +304,8 @@ class FeatureLoader:
     
     
     def mean_K_bands(self, songframes, K=40, nmels=40):
+        '''Average mel bands over K groups (for onset patterns with scale transform features).
+        '''
         [F, P] = songframes.shape
         Pproc = int((P/nmels)*K)
         procframes = np.zeros([F, Pproc])
@@ -222,6 +319,8 @@ class FeatureLoader:
         
         
     def nmfpitchbihist(self, frames):
+        '''NMF decomposition for pitch bihistogram features.
+        '''
         nbins, nfr = frames.shape
         npc = 2
         nb = int(np.sqrt(nbins))  # assume structure of pitch bihist is nbins*nbins
@@ -239,11 +338,13 @@ class FeatureLoader:
 
 
     def get_pb_for_file(self, melodia_file, precomp_melody=False, nmfpb=True, scale=True, stop_sec=30.0):
+        '''Extract pitch bihistogram features.
+        '''
         pbihist = []
         if precomp_melody:
-            pbihist = self.load_precomp_pb_from_melodia(melodia_file=melodia_file, stop_sec=stop_sec)
+            pbihist = self.load_precomp_pb_from_melodia(melodia_file, stop_sec=stop_sec)
         else:
-            pbihist = self.extract_pb_from_melodia(melodia_file=melodia_file, stop_sec=stop_sec)
+            pbihist = self.extract_pb_from_melodia(melodia_file, stop_sec=stop_sec)
         if len(pbihist) == 0:
             # no file was found
             return pbihist
@@ -256,7 +357,9 @@ class FeatureLoader:
         return pbihist
 
 
-    def extract_pb_from_melodia(self, melodia_file=None, stop_sec=30.0):
+    def extract_pb_from_melodia(self, melodia_file, stop_sec=30.0):
+        '''Extract pitch bihistogram from melodia output.
+        '''
         pbihist = []
         if not os.path.exists(melodia_file):
             return pbihist
@@ -266,18 +369,10 @@ class FeatureLoader:
         return pbihist
 
 
-    def load_precomp_pb_from_melodia(self, melodia_file=None, stop_sec=30.0):
+    def load_precomp_pb_from_melodia(self, bihist_file, stop_sec=30.0):
+        '''Load precomputed pitch bihistograms. 
+        '''
         pbihist = []
-        base = os.path.basename(melodia_file)    
-        root = '/import/c4dm-05/mariap/Melodia-melody-'+str(int(self.win2sec))+'sec/'
-        root_BL = '/import/c4dm-04/mariap/FeatureCsvs_BL_old/PB-melodia/'
-        root_SM = '/import/c4dm-04/mariap/FeatureCsvs/PB-melodia/'
-        if 'SampleAudio' in base:
-            root = root_SM
-        else:
-            root = root_BL
-            base = base.split('_')[-1].split('.csv')[0]+'_vamp_mtg-melodia_melodia_melody.csv'
-        bihist_file = os.path.join(root, base)
         if not os.path.exists(bihist_file):
             return pbihist
         print 'load precomputed pitch bihist', root

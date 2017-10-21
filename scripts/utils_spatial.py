@@ -127,6 +127,7 @@ def get_regions_from_shapefile(shapefile):
 def append_regions(df):
     countries, regions = get_regions_from_shapefile(SHAPEFILE)
     if 'French Guiana' not in countries:
+        # manual correction
         countries.append('French Guiana')
         regions.append('Latin America & Caribbean')
     df_regions = pd.DataFrame({'Country': countries, 'Region': regions})

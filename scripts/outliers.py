@@ -16,6 +16,8 @@ import utils_spatial
 
 
 def country_outlier_df(counts, labels, normalize=False, out_file=None):
+    '''Process dictionary of outlier counts by country to dataframe.
+    '''
     if len(counts.keys()) < len(np.unique(labels)):
         for label in np.unique(labels):
             if not counts.has_key(label):
@@ -50,6 +52,8 @@ def normalize_outlier_counts(outlier_counts, country_counts):
 
 
 def get_outliers_df(X, Y, chi2thr=0.999, out_file=None):
+    '''Compute outliers per country and output as a dataframe.
+    '''
     threshold, y_pred, MD = utils.get_outliers_Mahal(X, chi2thr=chi2thr)
     global_counts = Counter(Y[y_pred])
     df = country_outlier_df(global_counts, Y, normalize=True, out_file=out_file)
@@ -57,9 +61,9 @@ def get_outliers_df(X, Y, chi2thr=0.999, out_file=None):
 
 
 def print_most_least_outliers_topN(df, N=10):
+    '''Print countries with the most/least outlier recordings.
+    '''
     sort_inds = df['Outliers'].argsort()  # ascending order
-    #df_most = df[['Country', 'Outliers']].iloc[sort_inds[::-1][:N]]
-    #df_least = df[['Country', 'Outliers']].iloc[sort_inds[:N]]
     df_most = df.iloc[sort_inds[::-1][:N]]
     df_least = df.iloc[sort_inds[:N]]
     print "most outliers " 
@@ -69,6 +73,8 @@ def print_most_least_outliers_topN(df, N=10):
     
 
 def load_metadata(Yaudio, metadata_file):
+    '''Load metadata from file and sort in the order of Yaudio.
+    '''
     df = pd.read_csv(metadata_file)
     df_audio = pd.DataFrame({'Audio':Yaudio})
     ddf = pd.merge(df_audio, df, on='Audio', suffixes=['', '_r']) # in the order of Yaudio
@@ -76,6 +82,8 @@ def load_metadata(Yaudio, metadata_file):
 
 
 def print_clusters_metadata(df, cl_pred, out_file=None):
+    '''Print the top 3 most frequent countries in each cluster.
+    '''
     def get_top_N_counts(labels, N=3):
         ulab, ucount = np.unique(labels, return_counts=True)
         inds = np.argsort(ucount)
@@ -93,6 +101,8 @@ def print_clusters_metadata(df, cl_pred, out_file=None):
 
 
 def load_data(pickle_file, metadata_file):
+    '''Load data from pickle and align the metadata.
+    '''
     X_list, Y, Yaudio = pickle.load(open(pickle_file,'rb'))
     ddf = load_metadata(Yaudio, metadata_file=metadata_file)
     w, data_countries = utils_spatial.get_neighbors_for_countries_in_dataset(Y)
@@ -101,6 +111,8 @@ def load_data(pickle_file, metadata_file):
 
 
 def get_local_outliers_df(X, Y, w_dict, out_file=None):
+    '''Estimate outliers with respect to country neighbourhoods. 
+    '''
     spatial_outliers = utils.get_local_outliers_from_neighbors_dict(X, Y, w_dict, chi2thr=0.999, do_pca=True)
     spatial_counts = Counter(dict([(ll[0],ll[1]) for ll in spatial_outliers]))
     df_local = country_outlier_df(spatial_counts, Y, normalize=True, out_file=out_file)
@@ -108,6 +120,8 @@ def get_local_outliers_df(X, Y, w_dict, out_file=None):
 
 
 def get_country_clusters(X, bestncl=None, min_ncl=5, max_ncl=50):
+    '''Cluster recordings and return cluster centroids and predictions.
+    '''
     if bestncl is None:
         bestncl, ave_silh = utils.best_n_clusters_silhouette(X, min_ncl=min_ncl, max_ncl=max_ncl, metric="cosine")
     # get cluster predictions and metadata for each cluster

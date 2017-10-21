@@ -14,8 +14,6 @@ import load_features
 import util_filter_dataset
 
 
-#METADATA_FILE = 'sample_dataset/metadata.csv'
-#OUTPUT_FILES = ['sample_dataset/train_data.pickle', 'sample_dataset/val_data.pickle', 'sample_dataset/test_data.pickle']
 WIN_SIZE = 8
 METADATA_FILE = '../data/metadata.csv'
 OUTPUT_FILES = ['../data/train_data_'+str(WIN_SIZE)+'.pickle', 

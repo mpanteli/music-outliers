@@ -11,6 +11,9 @@ import pandas as pd
 
 
 def get_speech_vamp(df):
+    '''Process speech/music boundaries and return file indices that 
+        are mostly speech and should be removed from the dataset. 
+    '''
     jspeech = df.columns.get_loc("Speech")
     nfiles = len(df)
     speechinds = []
@@ -25,6 +28,9 @@ def get_speech_vamp(df):
 
 
 def get_speech_meta(df):
+    '''Process the music genre and return file indices that have genres not
+        related to 'world music' that should be excluded from the dataset.
+    '''
     genres = np.array(df["Genre_Album"].get_values(), dtype=str)
     speechinds_genre = []
     invalid_genres = ["Spoken Word", "Language Instruction", "Classical", 
@@ -42,15 +48,22 @@ def get_speech_meta(df):
 
 
 def get_missing_csv(df):
+    '''Check if feature files exist and return indices of files with
+        non-existent features that should be excluded from the dataset. 
+    '''
     nfiles = len(df)
     missing_csv = []
     for i in range(nfiles):
-        if not (os.path.exists(df["Melspec"].iloc[i]) and os.path.exists(df["Chroma"].iloc[i]) and os.path.exists(df["Melodia"].iloc[i])):
+        if not (os.path.exists(df["Melspec"].iloc[i]) and 
+                os.path.exists(df["Chroma"].iloc[i]) and 
+                os.path.exists(df["Melodia"].iloc[i])):
             missing_csv.append(i)
     return missing_csv
 
 
 def get_missing_country_meta(df):
+    '''Exclude files with not valid country information.
+    '''
     nfiles = len(df)
     missing_country = []
     country_labels = np.array(df['Country'].get_values(), dtype=str)
@@ -65,6 +78,8 @@ def get_missing_country_meta(df):
 
 
 def remove_missing_data(df):
+    '''Files with missing (meta)data are excluded from the final dataset.
+    '''
     speechinds_vamp = get_speech_vamp(df)
     speechinds_genre = get_speech_meta(df)
     speechinds = set(speechinds_vamp) | set(speechinds_genre)

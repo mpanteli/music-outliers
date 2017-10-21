@@ -74,6 +74,8 @@ def load_train_val_test_sets():
 
 
 def limit_to_n_seconds(dataset, n_sec=30.0, win_sec=8.0):
+    '''select only n_sec seconds for processing
+    '''
     X, Y, Yaudio = dataset
     uniq_audio, uniq_counts = np.unique(Yaudio, return_counts=True)
     frame_sr = 2.0

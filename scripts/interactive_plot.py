@@ -20,6 +20,18 @@ SHAPEFILE = os.path.join(os.path.dirname(__file__), 'util_data', 'shapefiles', '
 
 
 def get_random_point_in_polygon(poly):
+    '''Select at random a point within given polygon boundaries.
+
+    Parameters
+    ----------
+    poly : Polygon
+        The polygon boundaries.
+
+    Returns
+    -------
+    p : Point
+        A random point (x, y coords) inside the given polygon.
+    '''
     (minx, miny, maxx, maxy) = poly.bounds
     while True:
         p = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
@@ -28,6 +40,20 @@ def get_random_point_in_polygon(poly):
 
 
 def get_random_point_in_country_poly(countries_data):
+    '''Load country polygons and selects a point at random within each polygon.
+
+    Parameters
+    ----------
+    countries_data : np.array, 1D
+        Names of countries to select random points. 
+
+    Returns
+    -------
+    data_x : list of float
+        The x-coordinates of random points within each country in countries_data.
+    data_y : list of float
+        The y-coordinates of random points within each country in countries_data.
+    '''
     pp_x, pp_y, coords_poly, countries_poly = get_countries_lonlat_poly(SHAPEFILE)
     data_x = []
     data_y = []
@@ -51,6 +77,24 @@ def get_random_point_in_country_poly(countries_data):
 
 
 def get_countries_lonlat_poly(shapefile):
+    '''Load spatial information for each country from shapefiles.
+
+    Parameters
+    ----------
+    shapefile : str
+        Path to shapefile.
+
+    Returns
+    -------
+    pp_x : list of float
+        The x-coordinates of country polygons.
+    pp_y : list of float
+        The y-coordinates of country polygons.
+    mm.units : list of float tuples.
+        Polygon coordinates for each country.
+    countries_poly : np.arry, 1D
+        Country names for each polygon.
+    '''
     mm=Basemap()
     mm.readshapefile(shapefile, 'units', color='#444444', linewidth=.2)
     pp_x = []
@@ -68,7 +112,7 @@ def get_countries_lonlat_poly(shapefile):
 
 
 def add_bokeh_interactivity(p, r, hover_outlier=False):
-    '''add interactivity
+    '''Add plot interactivity.
     '''
     callback = CustomJS(args=dict(r=r), code="""
         var inds = cb_obj.get('selected')['1d'].indices;
@@ -97,7 +141,7 @@ def add_bokeh_interactivity(p, r, hover_outlier=False):
 
 
 def beautify_bokeh_background(p):
-    '''remove unnecessary background
+    '''Remove unnecessary background in plot. 
     '''
     p.outline_line_color = None
     p.grid.grid_line_color=None
@@ -109,7 +153,23 @@ def beautify_bokeh_background(p):
 
     
 def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
-    '''assume features, df are in the same order
+    '''Visualise outliers on an interactive world map figure. 
+
+    Parameters
+    ----------
+    MD : np.array, float, 1D
+        Mahalanobis distances for each data point.
+    y_pred : np.array, boolean, 1D
+        Whether data point was detected as an outlier or not. 
+    df : pd.DataFrame
+        Additional metadata (country, culture, language, genre, collection) for each data point. 
+    out_file : str
+        Path to export html file.
+
+    Returns
+    -------
+    p : bokeh
+        The interactive map.
     '''
     pp_x, pp_y, coords_poly, countries_poly = get_countries_lonlat_poly(SHAPEFILE)    
     data_x, data_y = get_random_point_in_country_poly(df['Country'].get_values())    
@@ -163,13 +223,16 @@ def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
     return p
 
 
-def plot_tabs(tab_all, tabs_feat, out_file="temp.html"):
+def plot_tabs(tab_all, tabs_feat, out_file=None):
+    '''Add tabs to bokeh plot.
+    '''
     tab1 = Panel(child=tab_all, title="All")
     tab2 = Panel(child=tabs_feat[0], title="Rhythm")
     tab3 = Panel(child=tabs_feat[1], title="Melody")
     tab4 = Panel(child=tabs_feat[2], title="Timbre")
     tab5 = Panel(child=tabs_feat[3], title="Harmony")
     tabs = Tabs(tabs=[tab1,tab2,tab3,tab4,tab5])
-    output_file(out_file)
-    save(tabs)
+    if out_file is not None:
+        output_file(out_file)
+        save(tabs)
     show(tabs)
