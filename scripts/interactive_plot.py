@@ -7,7 +7,7 @@ Created on Fri Jun 24 13:06:12 2016
 
 import numpy as np
 import matplotlib.pyplot as plt
-from bokeh.models import HoverTool, TapTool, CustomJS, Title, Label
+from bokeh.models import HoverTool, TapTool, CustomJS
 from bokeh.plotting import figure, show, save, output_file, ColumnDataSource
 from mpl_toolkits.basemap import Basemap
 from shapely.geometry import Point, Polygon
@@ -202,7 +202,7 @@ def plot_outliers_world_figure(MD, y_pred, df, out_file=None):
     
     TOOLS="wheel_zoom,box_zoom,pan,reset,save"
     
-    p = figure(tools=TOOLS, plot_width=1200, title="Outlier recordings per country (click on each point to listen to the audio). More info at: github.com/mpanteli/music-outliers/tree/master/demo/README.md.")
+    p = figure(tools=TOOLS, plot_width=1200, title="Outlier recordings per country (click on each point to listen to the audio). More info at: mpanteli.github.io/music-outliers/demo/", title_text_font_size='14pt')
     outlier_ind = np.argmax(MD)
     nonoutlier_ind = np.argmin(MD)
     rleg1 = p.circle(data_x[outlier_ind], data_y[outlier_ind], fill_color='red', alpha=alpha_color[outlier_ind], size=6,
