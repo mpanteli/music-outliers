@@ -219,6 +219,7 @@ def confusion_matrix_for_dataset(filename, classifier='LDA', output_data=False):
     X_val, X_test, Y_val, Y_test = train_test_split(X_val_test, Y_val_test, train_size=0.5, 
                                                         random_state=RANDOM_STATE, stratify=Y_val_test)
     accuracy, CF, labels = confusion_matrix(X_train, Y_train, X_test, Y_test, classifier=classifier)
+    print 'accuracy', accuracy
     if output_data:
         np.savetxt('../data/CFlabels.csv', labels, fmt='%s')
         np.savetxt('../data/CF.csv', CF, fmt='%10.5f')
