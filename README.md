@@ -48,7 +48,7 @@ A classification task predicting the country of origin of a recording is used to
 python scripts/classification.py
 ```
 
-The confusion matrix of 137 classes is exported into a .csv (see [confusion_matrix.csv](https://github.com/mpanteli/music-outliers/blob/master/data/confusion_matrix.csv) for the numerical data and [confusion_matrix_labels.csv](https://github.com/mpanteli/music-outliers/blob/master/data/confusion_matrix_labels.csv) for the class labels). 
+The confusion matrix of 137 classes is exported into a .csv (see [confusion_matrix.csv](https://github.com/mpanteli/music-outliers/blob/master/data/confusion_matrix.csv) for the numerical data and [confusion_matrix_labels.csv](https://github.com/mpanteli/music-outliers/blob/master/data/confusion_matrix_labels.csv) for the class labels).  
 See also the notebook [results_classification.ipynb](https://github.com/mpanteli/music-outliers/blob/master/notebooks/results_classification.ipynb).
 
 #### Outliers
