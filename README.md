@@ -1,7 +1,7 @@
 # music-outliers
 
 Data and code for the journal publication:
-Panteli, M., Benetos, E., Dixon, S. A computational study on outliers in world music. *PLoS ONE* (under-review).
+Panteli, M., Benetos, E., Dixon, S. A computational study on outliers in world music. *under-review*.
 
 Listen to music outliers in this [interactive demo](https://mpanteli.github.io/music-outliers/demo/outliers.html). More info about the demo [here](https://github.com/mpanteli/music-outliers/blob/master/demo/README.md). 
 
