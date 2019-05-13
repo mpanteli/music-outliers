@@ -284,7 +284,6 @@ def get_smoothie(filename='test.wav', param=None, segment=True, secondframedecom
         param = p
         param['fs'] = 44100
         param['step_size'] = 128
-    import pdb;pdb.set_trace()
     y, sr = librosa.load(filename, sr = param['fs'])
     param['fs'] = sr
     if hopinsec is not None:
