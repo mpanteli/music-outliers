@@ -31,7 +31,7 @@ def get_speech_meta(df):
     '''Process the music genre and return file indices that have genres not
         related to 'world music' that should be excluded from the dataset.
     '''
-    genres = np.array(df["Genre_Album"].get_values(), dtype=str)
+    genres = np.array(df["Genre"].get_values(), dtype=str)
     speechinds_genre = []
     invalid_genres = ["Spoken Word", "Language Instruction", "Classical", 
                         "Poetry", "Nature|Sounds", "Music Instruction", 

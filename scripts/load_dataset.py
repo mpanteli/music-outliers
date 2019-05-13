@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 
 import load_features
 import util_filter_dataset
+import extract_primary_features
 
 
 WIN_SIZE = 8
@@ -146,6 +147,9 @@ def features_for_train_test_sets(df, write_output=False):
     """
     X_idx, Y = np.arange(len(df)), df['Country'].get_values()
     train_set, val_set, test_set = get_train_val_test_idx(X_idx, Y)
+    # first, extract melspectrograms, chromagrams, melodia, speech/music segmentation
+    extract_primary_features.extract_features(df.iloc[np.concatenate([train_set[0], val_set[0], test_set[0]]), :])
+    # then, extract scale transform, mfcc, pitch bihist, chroma
     X_train, Y_train, Y_audio_train = extract_features(df.iloc[train_set[0], :], win2sec=WIN_SIZE)
     X_val, Y_val, Y_audio_val = extract_features(df.iloc[val_set[0], :], win2sec=WIN_SIZE)   
     X_test, Y_test, Y_audio_test = extract_features(df.iloc[test_set[0], :], win2sec=WIN_SIZE)

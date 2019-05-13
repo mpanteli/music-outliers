@@ -16,14 +16,23 @@ This project:
 - uses the (best) learned space to detect outlier recordings and 
 - explores relationships of music dissimilarity between different geographical areas of the world. 
 
+## Requirements
+
+This code requires:
+- Python2.7 and libraries listed in requirements.txt
+- Sonic Annotator: https://code.soundsoftware.ac.uk/projects/sonic-annotator/files 
+- Melodia Vamp Plugin: https://www.upf.edu/web/mtg/melodia
+- Speech/Music Segmenter Vamp Plugin: https://github.com/bbc/bbc-vamp-plugins/blob/master/README.md
+
 ## Usage
 
 #### Load dataset and extract features
 
 Given a set of audio recordings and metadata including the country of origin (e.g., as in data/metadata.csv): 
 - split the dataset into train, validation, and test sets,
-- extract features (scale transform, pitch bihistogram, MFCC stats, chroma stats) for each recording, 
-- standardise and concatenate to a numpy array of N_samples x F_features,  
+- extract primary features (melspectrogram, chromagram, melodia, speech/music segmentation)
+- extract secondary features (scale transform, pitch bihistogram, MFCC stats, chroma stats) for each recording, 
+- standardise and concatenate secondary features to a numpy array of N_samples x F_features,  
 - output each dataset as a pickle file. 
 
 ```python

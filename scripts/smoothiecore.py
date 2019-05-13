@@ -5,6 +5,8 @@ A module aimed at melody salience and melody features. It contains
 * a frequency transform inspired by constant-Q transforms
 * an NMF-based melodic salience function
 * methods that transform this salience into melody features (not implemented)
+
+Note: Original code by Matthias Mauch.
 """
 
 import sys
@@ -277,12 +279,12 @@ def segment_audio(y, sr):
     y = y[startSample:endSample]
     return y
 
-def get_smoothie(filename = 'test.wav', param = None, segment=True, secondframedecomp=False, hopinsec=None):
+def get_smoothie(filename='test.wav', param=None, segment=True, secondframedecomp=False, hopinsec=None):
     if param is None:
         param = p
-        param['fs'] = None
+        param['fs'] = 44100
         param['step_size'] = 128
-    
+    import pdb;pdb.set_trace()
     y, sr = librosa.load(filename, sr = param['fs'])
     param['fs'] = sr
     if hopinsec is not None:
@@ -306,23 +308,3 @@ def get_smoothie(filename = 'test.wav', param = None, segment=True, secondframed
             avechroma[:,i] = np.mean(chroma[:, (i*hop2):(i*hop2+win2)], axis=1, keepdims=True)            
         chroma = avechroma
     return chroma
-
-def get_smoothie_for_bihist(filename = 'test.wav', param = None, segment=True, hopinsec=None):
-    if param is None:
-        param = p
-        param['fs'] = None # no downsample
-        param['step_size'] = 128
-    
-    y, sr = librosa.load(filename, sr = param['fs'])
-    param['fs'] = sr
-    if hopinsec is not None:
-        param['step_size'] = int(round(hopinsec*param['fs']))
-    if segment:
-        y = segment_audio(y,sr)
-    # sg, t = smoothie_q_spectrogram(y, param)
-    # nmf_dict = create_smoothie_nfm_dict(smoothie_kernel, f, param)
-    sal, t, f0s = smoothie_salience(y, param)
-    sal = sal[-np.isnan(f0s),:]
-    chroma = wrap_to_octave(sal, param)
-    chromasr = param['fs']/float(param['step_size'])
-    return (chroma, chromasr)
