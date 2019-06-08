@@ -6,6 +6,9 @@ import smoothiecore
 import MFCC as mfc
 
 
+PATH_TO_SONIC_ANNOTATOR = os.getenv('PATH_TO_SONIC_ANNOTATOR', './sonic-annotator')
+
+
 def extract_melspectrograms(audio_file_list, output_csv_list):
 	failed_files = []
 	for audio_file, output_csv in zip(audio_file_list, output_csv_list):
@@ -45,7 +48,7 @@ def extract_melodia(audio_file_list, output_csv_list):
 	for audio_file, output_csv in zip(audio_file_list, output_csv_list):
 		try:
 			path_to_output_dir = os.path.dirname(output_csv)
-			os.system('./sonic-annotator -d vamp:mtg-melodia:melodia:melody %s -w csv --csv-basedir %s' % (audio_file, path_to_output_dir))
+			os.system('%s -d vamp:mtg-melodia:melodia:melody %s -w csv --csv-basedir %s' % (PATH_TO_SONIC_ANNOTATOR, audio_file, path_to_output_dir))
 			os.system('mv %s %s' % (os.path.join(path_to_output_dir, os.path.splitext(os.path.basename(audio_file))[0] + vamp_ext), output_csv))
 			_ = open(output_csv, "r").read()  # to check the plugin wrote the file
 			print "Melodia successfully extracted in %s" % output_csv
@@ -63,7 +66,7 @@ def extract_speech_music_segmentation(audio_file_list, output_csv_list):
 	for audio_file, output_csv in zip(audio_file_list, output_csv_list):
 		try:
 			path_to_output_dir = os.path.dirname(output_csv)
-			os.system('./sonic-annotator -d vamp:bbc-vamp-plugins:bbc-speechmusic-segmenter:segmentation %s -w csv --csv-basedir %s' % (audio_file, path_to_output_dir))
+			os.system('%s -d vamp:bbc-vamp-plugins:bbc-speechmusic-segmenter:segmentation %s -w csv --csv-basedir %s' % (PATH_TO_SONIC_ANNOTATOR, audio_file, path_to_output_dir))
 			os.system('mv %s %s' % (os.path.join(path_to_output_dir, os.path.splitext(os.path.basename(audio_file))[0] + vamp_ext), output_csv))
 			_ = open(output_csv, "r").read()  # to check the plugin wrote the file
 			print "Music segmentation successfully extracted in %s" % output_csv

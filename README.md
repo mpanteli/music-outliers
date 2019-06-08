@@ -24,7 +24,9 @@ This code requires:
 - Melodia Vamp Plugin: https://www.upf.edu/web/mtg/melodia
 - Speech/Music Segmenter Vamp Plugin: https://github.com/bbc/bbc-vamp-plugins/blob/master/README.md
 
-Install dependencies with conda:
+The path to sonic annotator defaults to the root of this repository. If you installed sonic annotator in a different location please update the variable PATH_TO_SONIC_ANNOTATOR in the script [scripts/extract_primary_features](scripts/extract_primary_features).
+
+Install python dependencies (with conda):
 ```
 conda create -n env python=2.7 anaconda
 source activate env
