@@ -96,7 +96,7 @@ def check_extract_primary_features(df):
     # checks if csv files for melspectrograms, chromagrams, melodia, speech/music segmentation exist
     # if the csv files don't exist, extract them
     extract_melspec, extract_chroma, extract_melodia, extract_speech = False, False, False, False
-    # TODO: check if csv files exist for each audio file, not only check the first one on the list
+    # TODO: check if csv files exist for each audio file, not just the first one on the list
     if os.path.exists(df['Audio'].iloc[0]):
         if not os.path.exists(df['Melspec'].iloc[0]):
             extract_melspec = True
