@@ -24,9 +24,9 @@ This code requires:
 - Melodia Vamp Plugin: https://www.upf.edu/web/mtg/melodia
 - Speech/Music Segmenter Vamp Plugin: https://github.com/bbc/bbc-vamp-plugins/blob/master/README.md
 
-The path to sonic annotator defaults to the root of this repository. If you installed sonic annotator in a different location please update the variable PATH_TO_SONIC_ANNOTATOR in the script [scripts/extract_primary_features](https://github.com/mpanteli/music-outliers/blob/b3e162e33ec66fbabf7e1df94ef666ce59f83b73/scripts/extract_primary_features.py#L9).
+Please follow the instructions in the links provided above to install Sonic Annotator and the Melodia and Speech/Music Segmenter Vamp Pplugins. The path to sonic annotator defaults to the root of this repository. If you installed sonic annotator in a different location please update the variable PATH_TO_SONIC_ANNOTATOR in the script [scripts/extract_primary_features](https://github.com/mpanteli/music-outliers/blob/b3e162e33ec66fbabf7e1df94ef666ce59f83b73/scripts/extract_primary_features.py#L9).
 
-Install python dependencies (with conda):
+Install python dependencies (eg. with conda):
 ```
 conda create -n env python=2.7 anaconda
 source activate env
@@ -49,6 +49,9 @@ python scripts/load_dataset.py
 ```
 
 ![alt tag](https://raw.githubusercontent.com/mpanteli/music-outliers/master/data/methodology.png)
+
+If you want to extract features for a different set of audio recordings you have to update the csv [data/metadata.csv](https://github.com/mpanteli/music-outliers/blob/master/data/metadata.csv) and specify the path to each audio file under the column `Audio`. You will also have to specify the desired path to export the melspectrogram, chromagram, melodia, speech/music segmentation for each audio file, under the columns `Melspec`, `Chroma`, `Melodia`, `Speech`. 
+
 
 #### Learn a feature space of music similarity 
 
