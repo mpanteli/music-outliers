@@ -24,7 +24,7 @@ This code requires:
 - Melodia Vamp Plugin: https://www.upf.edu/web/mtg/melodia
 - Speech/Music Segmenter Vamp Plugin: https://github.com/bbc/bbc-vamp-plugins/blob/master/README.md
 
-The path to sonic annotator defaults to the root of this repository. If you installed sonic annotator in a different location please update the variable PATH_TO_SONIC_ANNOTATOR in the script [scripts/extract_primary_features](scripts/extract_primary_features).
+The path to sonic annotator defaults to the root of this repository. If you installed sonic annotator in a different location please update the variable PATH_TO_SONIC_ANNOTATOR in the script [scripts/extract_primary_features](https://github.com/mpanteli/music-outliers/blob/b3e162e33ec66fbabf7e1df94ef666ce59f83b73/scripts/extract_primary_features.py#L9).
 
 Install python dependencies (with conda):
 ```
@@ -37,9 +37,9 @@ pip install -r requirements.txt
 
 #### Load dataset and extract features
 
-Given a set of audio recordings and metadata including the country of origin (e.g., as in data/metadata.csv): 
+Given a set of audio recordings and metadata including the country of origin (e.g., as in [data/metadata.csv](https://github.com/mpanteli/music-outliers/blob/master/data/metadata.csv)): 
+- extract primary features (melspectrogram, chromagram, melodia, speech/music segmentation),
 - split the dataset into train, validation, and test sets,
-- extract primary features (melspectrogram, chromagram, melodia, speech/music segmentation)
 - extract secondary features (scale transform, pitch bihistogram, MFCC stats, chroma stats) for each recording, 
 - standardise and concatenate secondary features to a numpy array of N_samples x F_features,  
 - output each dataset as a pickle file. 
