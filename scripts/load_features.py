@@ -117,15 +117,22 @@ class FeatureLoader:
             # bounds is empty list
             return music_idx
         nbounds = bounds.shape[0]
-        if len(np.where(bounds[:,2]=='m')[0])==0:
+        # TODO: the plugin seems to be returning different outputs now
+        music_label, speech_label = 'm', 's'
+        if 'Music' in bounds[:, 2] or 'Speech' in bounds[:, 2]:
+            music_label, speech_label = 'Music', 'Speech'
+        if len(np.where(bounds[:,2]==music_label)[0])==0:
             # no music segments
             return music_idx
-        elif len(np.where(bounds[:,2]=='s')[0])==nbounds:
+        elif len(np.where(bounds[:,2]==speech_label)[0])==nbounds:
             # all segments are speech
             return music_idx
+        elif len(np.where(bounds[:,2]==music_label)[0])==nbounds:
+            # all segments are music
+            return np.arange(100000)  # a very long number because the plugin doesn't seem to return duration
         else:
             win2_frames = np.int(np.round(self.win2sec * self.framessr2))
-            music_bounds = np.where(bounds[:, 2] == 'm')[0]
+            music_bounds = np.where(bounds[:, 2] == music_label)[0]
             bounds_in_frames = np.round(np.array(bounds[:, 0], dtype=float) * sr)
             duration_in_frames = np.ceil(np.array(bounds[:, 1], dtype=float) * sr)
             for music_bound in music_bounds:
@@ -224,6 +231,7 @@ class FeatureLoader:
             pblist.append(pb.iloc[music_idx, :])
             clabels.append(pd.DataFrame(np.repeat(df[class_label].iloc[i], n_frames)))
             aulabels.append(pd.DataFrame(np.repeat(df['Audio'].iloc[i], n_frames)))
+            print('Successfully extracted features for %s' % df['Melspec'].iloc[i])
         print len(oplist), len(mflist), len(chlist), len(pblist), len(clabels), len(aulabels)
         return pd.concat(oplist), pd.concat(mflist), pd.concat(chlist), pd.concat(pblist), pd.concat(clabels), pd.concat(aulabels)
 
@@ -375,7 +383,7 @@ class FeatureLoader:
         pbihist = []
         if not os.path.exists(bihist_file):
             return pbihist
-        print 'load precomputed pitch bihist', root
+        print 'load precomputed pitch bihist'
         pbihist = np.loadtxt(bihist_file, delimiter=',').T
         n_stop = np.int(np.ceil(stop_sec * self.framessr2))
         pbihist = pbihist[:, :np.min([pbihist.shape[0], n_stop])]

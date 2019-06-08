@@ -88,7 +88,7 @@ def create_smoothie_kernel(f, deltaf, fs):
 	"""
 	print >>sys.stdout, "[ SMOOTHIE Q kernel calculation ... ]"
 	n_filter = len(f)
-	n_fft = 2**nextpow2(np.ceil(fs/min(deltaf)))
+	n_fft = int(2**nextpow2(np.ceil(fs/min(deltaf))))
 	
 	thresh = 0.0054
 	smoothie_kernel = np.zeros([n_fft, n_filter], np.complex64)

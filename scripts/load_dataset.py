@@ -4,22 +4,24 @@ Created on Wed Mar 15 22:52:57 2017
 
 @author: mariapanteli
 """
+import os
 
 import numpy as np
 import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 
+import extract_primary_features
 import load_features
 import util_filter_dataset
-import extract_primary_features
 
 
 WIN_SIZE = 8
-METADATA_FILE = '../data/metadata.csv'
-OUTPUT_FILES = ['../data/train_data_'+str(WIN_SIZE)+'.pickle', 
-                '../data/val_data_'+str(WIN_SIZE)+'.pickle', 
-                '../data/test_data_'+str(WIN_SIZE)+'.pickle']
+DATA_DIR = 'data'
+METADATA_FILE = os.path.join(DATA_DIR, 'metadata.csv')
+OUTPUT_FILES = [os.path.join(DATA_DIR, 'train_data_'+str(WIN_SIZE)+'.pickle'), 
+                os.path.join(DATA_DIR, 'val_data_'+str(WIN_SIZE)+'.pickle'), 
+                os.path.join(DATA_DIR, 'test_data_'+str(WIN_SIZE)+'.pickle')]
 
 
 def get_train_val_test_idx(X, Y, seed=None):
@@ -81,10 +83,34 @@ def subset_labels(Y, N_min=10, N_max=100, seed=None):
             subset_idx.append(label_idx)
         else:
             # not enough samples for this class, skip
+            print("Found only %s samples from class %s (minimum %s)" % (counts, label, N_min))
             continue
     if len(subset_idx)>0:
         subset_idx = np.concatenate(subset_idx, axis=0)
-    return subset_idx
+        return subset_idx
+    else:
+        raise ValueError('No classes found with minimum %s samples' % N_min)
+
+
+def check_extract_primary_features(df):
+    # checks if csv files for melspectrograms, chromagrams, melodia, speech/music segmentation exist
+    # if the csv file don't exist, extract them
+    extract_melspec, extract_chroma, extract_melodia, extract_speech = False, False, False, False
+    if os.path.exists(df['Audio'].iloc[0]):
+        if not os.path.exists(df['Melspec'].iloc[0]):
+            extract_melspec = True
+        if not os.path.exists(df['Chroma'].iloc[0]):
+            extract_chroma = True
+        if not os.path.exists(df['Melodia'].iloc[0]):
+            extract_melodia = True
+        if not os.path.exists(df['Speech'].iloc[0]):
+            extract_speech = True
+        extract_primary_features.extract_features(df, melspec=extract_melspec,
+                                                  chroma=extract_chroma,
+                                                  melodia=extract_melodia,
+                                                  speech=extract_speech)
+    else:
+        print("Audio file %s does not exist. Primary features will not be extracted." % df['Audio'].iloc[0])
 
 
 def extract_features(df, win2sec=8.0):
@@ -107,7 +133,7 @@ def extract_features(df, win2sec=8.0):
         The audio labels
     """
     feat_loader = load_features.FeatureLoader(win2sec=win2sec)
-    frames_rhy, frames_mfcc, frames_chroma, frames_mel, Y_df, Y_audio_df = feat_loader.get_features(df)
+    frames_rhy, frames_mfcc, frames_chroma, frames_mel, Y_df, Y_audio_df = feat_loader.get_features(df, precomp_melody=False)
     print frames_rhy.shape, frames_mel.shape, frames_mfcc.shape, frames_chroma.shape
     X = np.concatenate((frames_rhy, frames_mel, frames_mfcc, frames_chroma), axis=1)
     Y = Y_df.get_values()
@@ -115,20 +141,19 @@ def extract_features(df, win2sec=8.0):
     return X, Y, Y_audio
 
 
-def sample_dataset(csv_file):
-    """ Load data from csv and select min 10 - max 100 recs from each country.
+def sample_dataset(df):
+    """ Select min 10 - max 100 recs from each country.
 
     Parameters
     ----------
-    csv_file : str
-        The path to the csv file containing the metadata (including country) of the tracks.
+    df : pd.DataFrame
+        The metadata (including country) of the tracks.
 
     Returns
     -------
     df : pd.DataFrame
         The metadata for the selected subset of tracks.
     """
-    df = pd.read_csv(csv_file)
     df = util_filter_dataset.remove_missing_data(df)
     subset_idx = subset_labels(df['Country'].get_values())
     df = df.iloc[subset_idx, :]
@@ -146,13 +171,11 @@ def features_for_train_test_sets(df, write_output=False):
         Whether to write files with the extracted features for train/val/test sets.
     """
     X_idx, Y = np.arange(len(df)), df['Country'].get_values()
+    extract_features(df.iloc[np.array([0])], win2sec=WIN_SIZE)
     train_set, val_set, test_set = get_train_val_test_idx(X_idx, Y)
-    # first, extract melspectrograms, chromagrams, melodia, speech/music segmentation
-    extract_primary_features.extract_features(df.iloc[np.concatenate([train_set[0], val_set[0], test_set[0]]), :])
-    # then, extract scale transform, mfcc, pitch bihist, chroma
-    X_train, Y_train, Y_audio_train = extract_features(df.iloc[train_set[0], :], win2sec=WIN_SIZE)
-    X_val, Y_val, Y_audio_val = extract_features(df.iloc[val_set[0], :], win2sec=WIN_SIZE)   
-    X_test, Y_test, Y_audio_test = extract_features(df.iloc[test_set[0], :], win2sec=WIN_SIZE)
+    X_train, Y_train, Y_audio_train = extract_features(df.iloc[train_set[0]], win2sec=WIN_SIZE)
+    X_val, Y_val, Y_audio_val = extract_features(df.iloc[val_set[0]], win2sec=WIN_SIZE)   
+    X_test, Y_test, Y_audio_test = extract_features(df.iloc[test_set[0]], win2sec=WIN_SIZE)
    
     train = [X_train, Y_train, Y_audio_train]
     val = [X_val, Y_val, Y_audio_val]
@@ -169,6 +192,8 @@ def features_for_train_test_sets(df, write_output=False):
 
 if __name__ == '__main__':
     # load dataset
-    df = sample_dataset(csv_file=METADATA_FILE)
+    df = pd.read_csv(METADATA_FILE)
+    check_extract_primary_features(df)
+    df = sample_dataset(df)
     train, val, test = features_for_train_test_sets(df, write_output=True)
 

@@ -52,7 +52,7 @@ class MFCCs:
         if self.sr is None:
             self.sr = sr
         # require log-amplitude
-        self.mfccs = librosa.feature.mfcc(S=librosa.logamplitude(self.melspec), n_mfcc=21)
+        self.mfccs = librosa.feature.mfcc(S=librosa.amplitude_to_db(self.melspec), n_mfcc=21)
         # remove DCT component        
         self.mfccs = self.mfccs[1:,:]
         

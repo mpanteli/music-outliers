@@ -20,10 +20,14 @@ def get_speech_vamp(df):
     for i in range(nfiles):
         #print i
         if os.path.exists(df.iat[i, jspeech]) and os.path.getsize(df.iat[i, jspeech])>0:
-            bounds = pd.read_csv(df.iat[i, jspeech], header=None, delimiter='\t').get_values()
+            bounds = pd.read_csv(df.iat[i, jspeech], header=None).get_values()
             if len(bounds)>0:
-                if len(np.where(bounds[:,2]=='m')[0])==0 or len(np.where(bounds[:,2]=='s')[0])==len(bounds):
-                    speechinds.append(i)
+                if 'm' in bounds[:,2] or 's' in bounds[:,2]:
+                    if len(np.where(bounds[:,2]=='m')[0])==0 or len(np.where(bounds[:,2]=='s')[0])==len(bounds):
+                        speechinds.append(i)
+                elif 'Music' in bounds[:,2] or 'Speech' in bounds[:,2]:
+                    if len(np.where(bounds[:,2]=='Music')[0])==0 or len(np.where(bounds[:,2]=='Speech')[0])==len(bounds):
+                        speechinds.append(i)
     return speechinds
 
 
@@ -58,6 +62,8 @@ def get_missing_csv(df):
                 os.path.exists(df["Chroma"].iloc[i]) and 
                 os.path.exists(df["Melodia"].iloc[i])):
             missing_csv.append(i)
+    if nfiles == len(missing_csv):
+        raise ValueError('No csvs for melspectrograms, chromagrams, melodia, double check the paths eg %s' % df["Melspec"].iloc[i])
     return missing_csv
 
 
@@ -88,4 +94,7 @@ def remove_missing_data(df):
     selectinds = np.asarray(list(set(range(len(df))) - (missing | speechinds | missing_country)))
 
     df = df.iloc[selectinds, :]
-    return df
+    if len(df)>0:
+        return df
+    else:
+        raise ValueError('Too many missing data, no samples left for processing')

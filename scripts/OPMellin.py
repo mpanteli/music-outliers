@@ -55,7 +55,7 @@ class OPMellin:
         if self.melspec is None:
             self.melspec = melspec
         if log:
-            self.melspec = librosa.logamplitude(self.melspec)
+            self.melspec = librosa.amplitude_to_db(self.melspec)
         if medianfilt:
             ks = int(0.1 * self.melsr) # 100ms kernel size
             if ks % 2 == 0: # ks must be odd

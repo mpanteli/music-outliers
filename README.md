@@ -24,6 +24,13 @@ This code requires:
 - Melodia Vamp Plugin: https://www.upf.edu/web/mtg/melodia
 - Speech/Music Segmenter Vamp Plugin: https://github.com/bbc/bbc-vamp-plugins/blob/master/README.md
 
+Install dependencies with conda:
+```
+conda create -n env python=2.7 anaconda
+source activate env
+pip install -r requirements.txt
+```
+
 ## Usage
 
 #### Load dataset and extract features
