@@ -93,10 +93,16 @@ def subset_labels(Y, N_min=10, N_max=100, seed=None):
 
 
 def check_extract_primary_features(df):
-    # checks if csv files for melspectrograms, chromagrams, melodia, speech/music segmentation exist
-    # if the csv files don't exist, extract them
+    """ Check if csv files for melspectrograms, chromagrams, melodia, speech/music segmentation exist, 
+        if the csv files don't exist, extract them.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Metadata including class label and path to audio, melspec, chroma
+    """
     extract_melspec, extract_chroma, extract_melodia, extract_speech = False, False, False, False
-    # TODO: check if csv files exist for each audio file, not just the first one on the list
+    # TODO: Check for each file in df, instead of just the first one
     if os.path.exists(df['Audio'].iloc[0]):
         if not os.path.exists(df['Melspec'].iloc[0]):
             extract_melspec = True
@@ -106,12 +112,10 @@ def check_extract_primary_features(df):
             extract_melodia = True
         if not os.path.exists(df['Speech'].iloc[0]):
             extract_speech = True
-        extract_primary_features.extract_features(df, melspec=extract_melspec,
-                                                  chroma=extract_chroma,
-                                                  melodia=extract_melodia,
-                                                  speech=extract_speech)
     else:
         print("Audio file %s does not exist. Primary features will not be extracted." % df['Audio'].iloc[0])
+    extract_primary_features.extract_features_for_file_list(df, 
+        melspec=extract_melspec, chroma=extract_chroma, melodia=extract_melodia, speech=extract_speech)
 
 
 def extract_features(df, win2sec=8.0):
